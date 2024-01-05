@@ -1,0 +1,18 @@
+meta {
+  name: create a malformed person
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://localhost:3001/api/persons
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Bess",
+    "starsign": "Huh"
+  }
+}

@@ -1,0 +1,18 @@
+meta {
+  name: create an existing person
+  type: http
+  seq: 9
+}
+
+post {
+  url: http://localhost:3001/api/persons
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Ada Lovelace",
+    "number": "123"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "fullstack-part3",
+  "version": "0.0.0",
+  "description": "My submission for part 3 of the University of Helsinki Full Stack course",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kuuotto/fullstack-part3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kuuotto/fullstack-part3/issues"
+  },
+  "homepage": "https://github.com/kuuotto/fullstack-part3#readme",
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
