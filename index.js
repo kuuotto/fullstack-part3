@@ -3,7 +3,7 @@ const morgan = require("morgan")
 const cors = require("cors")
 
 const corsOptions = {
-    origin: ["http://localhost:5173"] // only allow requests from these origins
+    origin: "*" // only allow requests from these origins
 }
 
 // create a new token for Morgan that shows the body of the request if available
@@ -127,7 +127,7 @@ app.get("/info", (request, response) => {
     response.send(page)
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`)
 })
