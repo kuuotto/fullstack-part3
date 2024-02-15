@@ -1,5 +1,10 @@
 const express = require("express")
 const morgan = require("morgan")
+const cors = require("cors")
+
+const corsOptions = {
+    origin: ["http://localhost:5173"] // only allow requests from these origins
+}
 
 // create a new token for Morgan that shows the body of the request if available
 morgan.token("body", (request, response) => {
@@ -10,9 +15,17 @@ morgan.token("body", (request, response) => {
     return request.body ? JSON.stringify(request.body) : ""
 })
 
+// create app
 const app = express()
+
+// enable processing of json
 app.use(express.json())
+
+// enable logging of requests
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body"))
+
+// enable cross-origin resource sharing
+app.use(cors(corsOptions))
 
 
 let persons = [
