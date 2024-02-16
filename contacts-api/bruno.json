@@ -1,5 +1,9 @@
 {
   "version": "1",
   "name": "contacts-api",
-  "type": "collection"
+  "type": "collection",
+  "presets": {
+    "requestType": "http",
+    "requestUrl": ""
+  }
 }
