@@ -27,6 +27,9 @@ app.use(morgan(":method :url :status :res[content-length] - :response-time ms :b
 // enable cross-origin resource sharing
 app.use(cors(corsOptions))
 
+// enable serving the frontend from the dist directory
+app.use(express.static("dist"))
+
 
 let persons = [
     {
