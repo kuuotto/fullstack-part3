@@ -1,6 +1,8 @@
+require("dotenv").config()
 const express = require("express")
 const morgan = require("morgan")
 const cors = require("cors")
+const Person = require("./models/person")
 
 const corsOptions = {
     origin: "*" // only allow requests from these origins
@@ -31,37 +33,16 @@ app.use(cors(corsOptions))
 app.use(express.static("dist"))
 
 
-let persons = [
-    {
-        "id": 1,
-        "name": "Arto Hellas",
-        "number": "040-123456"
-    },
-    {
-        "id": 2,
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
-    },
-    {
-        "id": 3,
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
-    },
-    {
-        "id": 4,
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
-    }
-]
-
-const generateId = (max) => {
-    // generates a random integer
-    const id = Math.ceil(Math.random() * Number.MAX_SAFE_INTEGER)
-    return id
-}
+// const generateId = (max) => {
+//     // generates a random integer
+//     const id = Math.ceil(Math.random() * Number.MAX_SAFE_INTEGER)
+//     return id
+// }
 
 app.get("/api/persons", (request, response) => {
-    response.json(persons)
+    Person.find({}).then(persons => {
+        response.json(persons)
+    })
 })
 
 app.get("/api/persons/:id", (request, response) => {
@@ -80,23 +61,29 @@ app.get("/api/persons/:id", (request, response) => {
 })
 
 app.delete("/api/persons/:id", (request, response) => {
-    const id = Number(request.params.id)
+    Person.findByIdAndDelete(request.params.id)
+        .then(result => { response.status(204).send() })
+        .catch(error => {
+            if (error.name === "CastError") {
+                // this error arises if the supplied id cannot be converted to
+                // an actual object id
+                response.status(400).send({error: `Malformatted id: ${request.params.id}`})
+                return
+            }
 
-    // filter contacts
-    persons = persons.filter(person => person.id !== id)
-
-    // send response code
-    response.sendStatus(204)
+            console.log(`Could not delete contact. ${error.name}: ${error.message}$`)
+            response.status(500).send()
+        })
 })
 
 app.post("/api/persons", (request, response) => {
     const body = request.body
 
     // create a new person
-    const person = {
+    const person = Person({
         name: body.name,
         number: body.number
-    }
+    })
 
     // check that the required fields are included
     const requiredFields = ["name", "number"]
@@ -108,20 +95,17 @@ app.post("/api/persons", (request, response) => {
     }
 
     // check that the name doesn't already exist
-    if (persons.some(p => p.name == person.name)) {
-        return response.status(400).json({
-            error: `a person with the name ${person.name} already exists`
-        })
-    }
+    // if (persons.some(p => p.name == person.name)) {
+    //     return response.status(400).json({
+    //         error: `a person with the name ${person.name} already exists`
+    //     })
+    // }
 
-    // add an id to the contact
-    person.id = generateId()
-
-    // add contact to list
-    persons = persons.concat(person)
-
-    // respond with the newly created person
-    response.json(person)
+    // add contact to database
+    person.save().then(savedPerson => {
+        // respond with the newly created person
+        response.json(savedPerson)
+    })
 })
 
 app.get("/info", (request, response) => {
@@ -130,7 +114,7 @@ app.get("/info", (request, response) => {
     response.send(page)
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`)
 })
