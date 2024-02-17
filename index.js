@@ -38,24 +38,23 @@ app.get("/api/persons", (request, response) => {
     })
 })
 
-app.get("/api/persons/:id", (request, response) => {
-    const id = Number(request.params.id)
+app.get("/api/persons/:id", (request, response, next) => {
+    const id = request.params.id
 
-    // find the person corresponding to the id
-    const person = persons.find(person => person.id === id)
-
-    if (person) {
-        // send the correct person
-        response.json(person)
-    } else {
-        // send an error code
-        response.sendStatus(404)
-    }
+    Person.findById(id)
+        .then(person => {
+            if (person) {
+                response.json(person)
+            } else {
+                response.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 
 app.delete("/api/persons/:id", (request, response, next) => {
     Person.findByIdAndDelete(request.params.id)
-        .then(result => { response.status(204).send() })
+        .then(result => { response.status(204).end() })
         .catch(error => next(error))
 })
 
@@ -101,8 +100,13 @@ app.put("/api/persons/:id", (request, response, next) => {
 
 app.get("/info", (request, response) => {
     const time = new Date().toString()
-    const page = `<p>Phonebook has contact information of ${persons.length} people.</p><p>${time}</p>`
-    response.send(page)
+
+    // count the number of people in the database
+    Person.find({}).then(persons => {
+        const page = `<p>Phonebook has contact information of ${persons.length} people.</p><p>${time}</p>`
+        response.send(page)
+    })
+
 })
 
 const errorHandler = (error, request, response, next) => {
