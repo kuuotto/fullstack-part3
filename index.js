@@ -32,13 +32,6 @@ app.use(cors(corsOptions))
 // enable serving the frontend from the dist directory
 app.use(express.static("dist"))
 
-
-// const generateId = (max) => {
-//     // generates a random integer
-//     const id = Math.ceil(Math.random() * Number.MAX_SAFE_INTEGER)
-//     return id
-// }
-
 app.get("/api/persons", (request, response) => {
     Person.find({}).then(persons => {
         response.json(persons)
@@ -60,20 +53,10 @@ app.get("/api/persons/:id", (request, response) => {
     }
 })
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
     Person.findByIdAndDelete(request.params.id)
         .then(result => { response.status(204).send() })
-        .catch(error => {
-            if (error.name === "CastError") {
-                // this error arises if the supplied id cannot be converted to
-                // an actual object id
-                response.status(400).send({error: `Malformatted id: ${request.params.id}`})
-                return
-            }
-
-            console.log(`Could not delete contact. ${error.name}: ${error.message}$`)
-            response.status(500).send()
-        })
+        .catch(error => next(error))
 })
 
 app.post("/api/persons", (request, response) => {
@@ -102,10 +85,11 @@ app.post("/api/persons", (request, response) => {
     // }
 
     // add contact to database
-    person.save().then(savedPerson => {
-        // respond with the newly created person
-        response.json(savedPerson)
-    })
+    person.save()
+        .then(savedPerson => {
+            // respond with the newly created person
+            response.json(savedPerson)
+        })
 })
 
 app.get("/info", (request, response) => {
@@ -113,6 +97,18 @@ app.get("/info", (request, response) => {
     const page = `<p>Phonebook has contact information of ${persons.length} people.</p><p>${time}</p>`
     response.send(page)
 })
+
+const errorHandler = (error, request, response, next) => {
+    if (error.name === "CastError") {
+        return response.status(400).send({error: `Malformatted id`})
+    }
+
+    // pass any remaining errors to the default Express error handler
+    next(error)
+}
+
+// enable errorHandler
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
