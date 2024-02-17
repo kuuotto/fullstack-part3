@@ -77,19 +77,26 @@ app.post("/api/persons", (request, response) => {
         })
     }
 
-    // check that the name doesn't already exist
-    // if (persons.some(p => p.name == person.name)) {
-    //     return response.status(400).json({
-    //         error: `a person with the name ${person.name} already exists`
-    //     })
-    // }
-
     // add contact to database
     person.save()
         .then(savedPerson => {
             // respond with the newly created person
             response.json(savedPerson)
         })
+})
+
+app.put("/api/persons/:id", (request, response, next) => {
+    const id = request.params.id
+    const body = request.body
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(id, person, { new: true })
+        .then(updatedPerson => {response.json(updatedPerson)})
+        .catch(error => next(error))
 })
 
 app.get("/info", (request, response) => {
