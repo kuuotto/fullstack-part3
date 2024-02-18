@@ -64,7 +64,7 @@ app.post("/api/persons", (request, response, next) => {
     // create a new person
     const person = Person({
         name: body.name,
-        number: body.number
+        number: body.number.replaceAll(" ", "")
     })
 
     // add contact to database
@@ -82,7 +82,7 @@ app.put("/api/persons/:id", (request, response, next) => {
 
     const person = {
         name: body.name,
-        number: body.number
+        number: body.number.replaceAll(" ", "")
     }
 
     Person.findByIdAndUpdate(id, person, { new: true, runValidators: true })
