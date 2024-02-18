@@ -8,13 +8,20 @@ const url = process.env.MONGODB_URL
 console.log(`Connecting to MongoDB database at ${url}`)
 
 mongoose.connect(url)
-    .then(result => {console.log("Connected to MongoDB")})
-    .catch(error => {console.log(`Failed to connect to MongoDB: ${error.message}`)})
+    .then(result => { console.log("Connected to MongoDB") })
+    .catch(error => { console.log(`Failed to connect to MongoDB: ${error.message}`) })
 
 // create a schema corresponding to a person
 const personSchema = mongoose.Schema({
-    name: String,
-    number: String,
+    name: {
+        type: String,
+        minLength: [3, "validation-error-name-too-short"],
+        required: "validation-error-name-missing",
+    },
+    number: {
+        type: String,
+        required: "validation-error-number-missing",
+    },
 })
 
 // alter the way persons from the database are parsed into JSON
