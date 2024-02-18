@@ -20,6 +20,14 @@ const personSchema = mongoose.Schema({
     },
     number: {
         type: String,
+        validate: {
+            validator: value => {
+                // value needs to be at least 8 numbers (+1 dash) and conform to the format
+                return /^\d{2,3}-\d+$/.test(value)
+            },
+            message: "validation-error-number-incorrect"
+        },
+        minLength: [9, "validation-error-number-too-short"],
         required: "validation-error-number-missing",
     },
 })
