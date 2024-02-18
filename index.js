@@ -58,7 +58,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
     const body = request.body
 
     // create a new person
@@ -67,21 +67,13 @@ app.post("/api/persons", (request, response) => {
         number: body.number
     })
 
-    // check that the required fields are included
-    const requiredFields = ["name", "number"]
-    const missingFields = requiredFields.filter(reqField => !person[reqField])
-    if (missingFields.length > 0) {
-        return response.status(400).json({
-            error: `the following fields are missing: ${[missingFields]}`
-        })
-    }
-
     // add contact to database
     person.save()
         .then(savedPerson => {
             // respond with the newly created person
             response.json(savedPerson)
         })
+        .catch(error => next(error))
 })
 
 app.put("/api/persons/:id", (request, response, next) => {
@@ -93,8 +85,8 @@ app.put("/api/persons/:id", (request, response, next) => {
         number: body.number
     }
 
-    Person.findByIdAndUpdate(id, person, { new: true })
-        .then(updatedPerson => {response.json(updatedPerson)})
+    Person.findByIdAndUpdate(id, person, { new: true, runValidators: true })
+        .then(updatedPerson => { response.json(updatedPerson) })
         .catch(error => next(error))
 })
 
@@ -111,7 +103,12 @@ app.get("/info", (request, response) => {
 
 const errorHandler = (error, request, response, next) => {
     if (error.name === "CastError") {
-        return response.status(400).send({error: `Malformatted id`})
+        return response.status(400).send({ error: `Malformatted id` })
+    } else if (error.name === "ValidationError") {
+        // if this is a validation error, send an array of error codes in response
+        return response.status(400).send({ 
+            errors: Object.values(error.errors).map(err => err.message)
+        })
     }
 
     // pass any remaining errors to the default Express error handler
