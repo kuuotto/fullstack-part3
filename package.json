@@ -7,7 +7,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui": "rm -rf dist && cd ../fullstack/part2/phonebook && npm run build && cp -r dist ../../../fullstack-part3"
+    "build:ui": "rm -rf dist && cd ../fullstack/part2/phonebook && npm run build && cp -r dist ../../../fullstack-part3",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,8 @@
   },
   "homepage": "https://github.com/kuuotto/fullstack-part3#readme",
   "devDependencies": {
+    "@stylistic/eslint-plugin-js": "^1.6.2",
+    "eslint": "^8.56.0",
     "nodemon": "^3.0.2"
   },
   "dependencies": {
